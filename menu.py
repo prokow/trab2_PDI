@@ -9,15 +9,13 @@ def redimensionar_imagem(img, max_largura=800):
         escala = max_largura / largura
         nova_largura = int(largura * escala)
         nova_altura = int(altura * escala)
-        img_redimensionada = cv2.resize(img, (nova_largura, nova_altura), interpolation=cv2.INTER_AREA)
-        return img_redimensionada
-    return img
-
+        return cv2.resize(img, (nova_largura, nova_altura), interpolation=cv2.INTER_AREA)
+    return img.copy()
 
 def aplicar_clahe(img):
     lab = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
     l, a, b = cv2.split(lab)
-    clahe = cv2.createCLAHE(clipLimit=40.0, tileGridSize=(8, 8))
+    clahe = cv2.createCLAHE(clipLimit=8.0, tileGridSize=(8, 8))
     l_clahe = clahe.apply(l)
     lab_clahe = cv2.merge((l_clahe, a, b))
     img_clahe = cv2.cvtColor(lab_clahe, cv2.COLOR_LAB2BGR)
@@ -44,40 +42,6 @@ def colocar_titulo(imagem, texto):
     return imagem_rotulada
 
 
-def histogramaEqualizacao(imagem):
-    imagem_cinza = cv2.cvtColor(imagem, cv2.COLOR_BGR2GRAY)
-    hist, _ = np.histogram(imagem_cinza.flatten(), 256, [0, 256])
-    cdf = hist.cumsum()
-    cdf_normalized = cdf * hist.max() / cdf.max()
-    
-    plt.figure()
-    plt.subplot(231)
-    plt.imshow(imagem_cinza, cmap='gray')
-    plt.subplot(234)
-    plt.plot(hist)
-    plt.plot(cdf_normalized, color='b')
-    plt.xlabel('Intensidade')
-    plt.ylabel('Número de Pixels')
-    
-  
-    
-    # Aplicar CLAHE
-    claheObj = cv2.createCLAHE(clipLimit=10.0, tileGridSize=(8, 8))
-    claheImg = claheObj.apply(imagem_cinza)
-    
-    claheHist, _ = np.histogram(claheImg.flatten(), 256, [0, 256])
-    claheCdf = claheHist.cumsum()
-    claheCdf_normalized = claheCdf * claheHist.max() / claheCdf.max()
-    plt.subplot(233)
-    plt.imshow(claheImg, cmap='gray')
-    plt.subplot(236)
-    plt.plot(claheHist)
-    plt.plot(claheCdf_normalized, color='b')
-    plt.xlabel('Intensidade')
-    plt.ylabel('Número de Pixels')
-    plt.show()
-
-
 
 
 
@@ -88,19 +52,15 @@ def menu(img_path):
         return
     
     # Exibe o histograma em uma janela separada usando matplotlib
-    histogramaEqualizacao(img)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-
     
     # Etapa 1: Redimensionar
-    #img_redim = redimensionar_imagem(img)
+    img_redim = redimensionar_imagem(img)
     
     # Etapa 2: Aplicar CLAHE
-    #img_clahe = aplicar_clahe(img_redim)
+    img_clahe = aplicar_clahe(img_redim)
     
     # Etapa 3: Converter para escala de cinza
-    #img_cinza = converter_para_cinza(img_clahe)
+    img_cinza = converter_para_cinza(img_clahe)
     
     # Etapa 4: Binarizar imagem
     #img_bin = binarizar_imagem(img_cinza)
@@ -110,16 +70,20 @@ def menu(img_path):
     
     
     # Exibir imagens com títulos
-    #img1 = colocar_titulo(img_redim, "Redimensionada")
-    #img2 = colocar_titulo(img_clahe, "CLAHE")
-    #img3 = colocar_titulo(cv2.cvtColor(img_cinza, cv2.COLOR_GRAY2BGR), "Escala de Cinza")
+    img1 = colocar_titulo(img_redim, "Redimensionada")
+    img2 = colocar_titulo(img_clahe, "CLAHE")
+    img3 = colocar_titulo(cv2.cvtColor(img_cinza, cv2.COLOR_GRAY2BGR), "Escala de Cinza")
     #img4 = colocar_titulo(cv2.cvtColor(img_bin, cv2.COLOR_GRAY2BGR), "Binarizada")
     #img5 = colocar_titulo(cv2.cvtColor(img_bordas, cv2.COLOR_GRAY2BGR), "Bordas (LoG)")
     
     # Concatenar imagens horizontalmente
-    #resultado = cv2.hconcat([img1, img2, img3, img5])
+    resultado = cv2.hconcat([img1, img2, img3])  # , img5])
     
     # Exibir resultado em janela única
-    #cv2.imshow("Preprocessamento", resultado)
+    cv2.imshow("Preprocessamento", resultado)
     
+    
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
 menu("traffic.png")
