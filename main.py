@@ -120,7 +120,8 @@ def calcular_assinatura(contorno):
 
 # Função principal de classificação que determina a forma de uma ROI.
 # Pré-condição: 'contorno' é um contorno válido; 'assinaturas_padrao' é um dicionário com as assinaturas ideais.
-# Pós-condição: Retorna uma tupla (nome_da_forma, assinatura_calculada). 'nome_da_forma' é uma string ou None se não for reconhecida.
+# Pós-condição: Retorna uma tupla (nome_da_forma, assinatura_calculada). 
+# 'nome_da_forma' é uma string ou None se não for reconhecida.
 def classificar_placa(contorno, assinaturas_padrao, th_assinatura_circulo=0.015):
     assinatura_para_plotar = calcular_assinatura(contorno) # Sempre calculamos para poder visualizar
     
@@ -239,9 +240,9 @@ def main():
 
     # Etapa 4: Apresentação Final dos Resultados
     exibir_imagem_no_label(img_final_com_deteccoes, lbl_resultado_forma)
-    texto_final_formatado = f"Análise Concluída. {len(resultados_finais)} ROIs avaliadas:\n\n"
-    texto_final_formatado += "\n".join(resultados_finais)
-    lbl_resultado_texto.config(text=texto_final_formatado, justify=tk.LEFT)
+    resultado_texto = f"Análise Concluída. {len(resultados_finais)} ROIs avaliadas:\n\n"
+    resultado_texto += "\n".join(resultados_finais)
+    lbl_resultado_texto.config(text=resultado_texto, justify=tk.LEFT)
     
     messagebox.showinfo("Concluído", "Análise de todas as ROIs finalizada!")
 
@@ -256,10 +257,28 @@ def main():
 if __name__ == "__main__":
 
     # 1. Otimização: Calcula as assinaturas padrão UMA ÚNICA VEZ
-    circulo_img = np.zeros((100, 100), dtype=np.uint8); cv2.circle(circulo_img, (50, 50), 45, 255, 1); c, _ = cv2.findContours(circulo_img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE); assinatura_circulo = calcular_assinatura(c[0])
-    losango_img = np.zeros((100, 100), dtype=np.uint8); pontos_losango = np.array([[50, 5], [95, 50], [50, 95], [5, 50]], np.int32); cv2.polylines(losango_img, [pontos_losango], True, 255, 2); los_cont, _ = cv2.findContours(losango_img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE); assinatura_losango = calcular_assinatura(los_cont[0])
-    pontos_oct = np.array([[31, 10], [69, 10], [90, 31], [90, 69], [69, 90], [31, 90], [10, 69], [10, 31]], np.int32); octogono_img = np.zeros((100, 100), dtype=np.uint8); cv2.polylines(octogono_img, [pontos_oct], True, 255, 2); oct_cont, _ = cv2.findContours(octogono_img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE); assinatura_octogono = calcular_assinatura(oct_cont[0])
-    pontos_tri_inv = np.array([[10, 10], [90, 10], [50, 90]], np.int32); tri_inv_img = np.zeros((100, 100), dtype=np.uint8); cv2.polylines(tri_inv_img, [pontos_tri_inv], True, 255, 2); tri_inv_cont, _ = cv2.findContours(tri_inv_img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE); assinatura_tri_inv = calcular_assinatura(tri_inv_cont[0])
+    circulo_img = np.zeros((100, 100), dtype=np.uint8); 
+    cv2.circle(circulo_img, (50, 50), 45, 255, 1); 
+    c, _ = cv2.findContours(circulo_img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE); 
+    assinatura_circulo = calcular_assinatura(c[0])
+    
+    losango_img = np.zeros((100, 100), dtype=np.uint8); 
+    pontos_losango = np.array([[50, 5], [95, 50], [50, 95], [5, 50]], np.int32); 
+    cv2.polylines(losango_img, [pontos_losango], True, 255, 2); 
+    los_cont, _ = cv2.findContours(losango_img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE); 
+    assinatura_losango = calcular_assinatura(los_cont[0])
+    
+    pontos_oct = np.array([[31, 10], [69, 10], [90, 31], [90, 69], [69, 90], [31, 90], [10, 69], [10, 31]], np.int32); 
+    octogono_img = np.zeros((100, 100), dtype=np.uint8); 
+    cv2.polylines(octogono_img, [pontos_oct], True, 255, 2); 
+    oct_cont, _ = cv2.findContours(octogono_img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE); 
+    assinatura_octogono = calcular_assinatura(oct_cont[0])
+    
+    pontos_tri_inv = np.array([[10, 10], [90, 10], [50, 90]], np.int32); 
+    tri_inv_img = np.zeros((100, 100), dtype=np.uint8); 
+    cv2.polylines(tri_inv_img, [pontos_tri_inv], True, 255, 2); 
+    tri_inv_cont, _ = cv2.findContours(tri_inv_img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE); 
+    assinatura_tri_inv = calcular_assinatura(tri_inv_cont[0])
     
     assinaturas_padrao = {
         "Placa de Regulamentacao": assinatura_circulo,
